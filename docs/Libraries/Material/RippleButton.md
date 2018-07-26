@@ -7,42 +7,116 @@ Instantiate a new button with `userdata Button.new(string BUTTON_TYPE, RbxObject
 Example:
 ```lua
 local Resources = require(game:GetService("ReplicatedStorage"):WaitForChild("Resources"))
-local Button = Resources:LoadLibrary("Button")
+local Color = Resources:LoadLibrary("Color")
+local Enumeration = Resources:LoadLibrary("Enumeration")
+local PseudoInstance = Resources:LoadLibrary("PseudoInstance")
+local NewSnackbar = Resources:LoadLibrary("Snackbar").new
+local SnackbarText = "You clicked the %s style button!"
 
-local Players = game:GetService("Players")
-local LocalPlayer repeat LocalPlayer = Players.LocalPlayer until LocalPlayer or not wait()
-local PlayerGui repeat PlayerGui = LocalPlayer:FindFirstChildOfClass("PlayerGui") until PlayerGui or not wait()
+local Player = game:GetService("Players").LocalPlayer
+local PlayerGui = Player:WaitForChild("PlayerGui")
 
-local Screen = Instance.new("ScreenGui", PlayerGui)
-local Frame = Instance.new("Frame", Screen)
-Frame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "RippleButtonExample"
+ScreenGui.Parent = PlayerGui
+
+local Frame = Instance.new("Frame")
+Frame.AnchorPoint = Vector2.new(0.5, 0.5)
 Frame.BorderSizePixel = 0
-Frame.Size = UDim2.new(1, 0, 1, 0)
+Frame.BackgroundColor3 = Color.White
+Frame.Size = UDim2.new(0.2, 0, 0.3, 0)
+Frame.Position = UDim2.new(0.5, 0, 0.5, 0)
+Frame.Name = "ButtonFrame"
+Frame.Parent = ScreenGui
 
-local Submit = Button.new("Flat", Frame) -- Use "Custom" to remove the rounded corners
-Submit.TextSize = 18
-Submit.TextColor3 = Color3.fromRGB(255, 255, 255)
-Submit.Size = UDim2.new(0, 82, 0, 36)
-Submit.Position = UDim2.new(0, 10, 0, 100)
-Submit.Font = Enum.Font.SourceSansBold
-Submit.Text = "SUBMIT"
+local TitleLabel = Instance.new("TextLabel")
+TitleLabel.AnchorPoint = Vector2.new(0.5, 0)
+TitleLabel.BackgroundTransparency = 1
+TitleLabel.Name = "TitleLabel"
+TitleLabel.Size = UDim2.new(1, -20, 0, 35)
+TitleLabel.Position = UDim2.new(0.5, 0, 0, 10)
+TitleLabel.Font = Enum.Font.SourceSansSemibold
+TitleLabel.Text = "RippleButton Example"
+TitleLabel.TextColor3 = Color.Black
+TitleLabel.TextScaled = true
+TitleLabel.TextTransparency = 0.129
+TitleLabel.Parent = Frame
 
-Submit.MouseButton1Click:Connect(function()
-	print("MouseButton1Click")
+local FlatButton, OutlinedButton, ContainedButton, DisabledCheckbox do
+	FlatButton = PseudoInstance.new("RippleButton")
+	FlatButton.AnchorPoint = Vector2.new(0.5, 0.5)
+	FlatButton.Size = UDim2.new(1, -30, 0, 35)
+	FlatButton.Position = UDim2.new(0.5, 0, 0.5, -40)
+	FlatButton.PrimaryColor3 = Color.Teal[500]
+	FlatButton.Text = "FLAT BUTTON"
+	FlatButton.Font = Enum.Font.SourceSansBold
+	FlatButton.Style = Enumeration.ButtonStyle.Flat
+	FlatButton.Parent = Frame
+	
+	OutlinedButton = PseudoInstance.new("RippleButton")
+	OutlinedButton.AnchorPoint = Vector2.new(0.5, 0.5)
+	OutlinedButton.Size = UDim2.new(1, -30, 0, 35)
+	OutlinedButton.Position = UDim2.new(0.5, 0, 0.5, 0)
+	OutlinedButton.PrimaryColor3 = Color.Teal[500]
+	OutlinedButton.Text = "OUTLINED BUTTON"
+	OutlinedButton.Font = Enum.Font.SourceSansBold
+	OutlinedButton.Style = Enumeration.ButtonStyle.Outlined
+	OutlinedButton.Parent = Frame
+	
+	ContainedButton = PseudoInstance.new("RippleButton")
+	ContainedButton.AnchorPoint = Vector2.new(0.5, 0.5)
+	ContainedButton.Size = UDim2.new(1, -30, 0, 35)
+	ContainedButton.Position = UDim2.new(0.5, 0, 0.5, 40)
+	ContainedButton.PrimaryColor3 = Color.Teal[500]
+	ContainedButton.Text = "CONTAINED BUTTON"
+	ContainedButton.Font = Enum.Font.SourceSansBold
+	ContainedButton.BorderRadius = 4
+	ContainedButton.Style = Enumeration.ButtonStyle.Contained
+	ContainedButton.Parent = Frame
+	
+	local DisabledLabel = Instance.new("TextLabel")
+	DisabledLabel.AnchorPoint = Vector2.new(0, 1)
+	DisabledLabel.BackgroundTransparency = 1
+	DisabledLabel.Name = "DisabledLabel"
+	DisabledLabel.Size = UDim2.new(1, -55, 0, 35)
+	DisabledLabel.Position = UDim2.new(0, 20, 1, -5)
+	DisabledLabel.Font = Enum.Font.SourceSans
+	DisabledLabel.Text = "DISABLED BUTTONS"
+	DisabledLabel.TextColor3 = Color.Black
+	DisabledLabel.TextSize = 18
+	DisabledLabel.TextXAlignment = Enum.TextXAlignment.Left
+	DisabledLabel.TextTransparency = 0.4
+	DisabledLabel.Parent = Frame
+	
+	DisabledCheckbox = PseudoInstance.new("Checkbox")
+	DisabledCheckbox.PrimaryColor3 = Color.Teal[500]
+	DisabledCheckbox.Checked = false
+	DisabledCheckbox.AnchorPoint = Vector2.new(1, 1)
+	DisabledCheckbox.Position = UDim2.new(1, -10, 1, -10)
+	DisabledCheckbox.Theme = Enumeration.MaterialTheme.Light
+	DisabledCheckbox.ZIndex = 12
+	DisabledCheckbox.Parent = Frame
+end
+
+FlatButton.OnPressed:Connect(function()
+	NewSnackbar(SnackbarText:format("Flat"), ScreenGui)
 end)
 
-wait(1)
+OutlinedButton.OnRightPressed:Connect(function()
+	NewSnackbar(SnackbarText:format("Outlined"), ScreenGui)
+end)
 
-Submit:Ripple()
+ContainedButton.OnMiddlePressed:Connect(function()
+	NewSnackbar(SnackbarText:format("Contained"), ScreenGui)
+end)
 
-wait(1)
-
-Frame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-Submit.TextColor3 = Color3.fromRGB(0, 0, 0)
-
-wait(1)
-
-Submit:Destroy()
+DisabledCheckbox.OnChecked:Connect(function(On)
+	if not On then
+		FlatButton.Disabled, OutlinedButton.Disabled, ContainedButton.Disabled = false, false, false
+	else
+		FlatButton.Disabled, OutlinedButton.Disabled, ContainedButton.Disabled = true, true, true
+	end
+end)
 ```
 There is also a `Ripple` method which just plays a Ripple.
 ```lua
